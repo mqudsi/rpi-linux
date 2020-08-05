@@ -511,6 +511,22 @@ static int uvc_parse_format(struct uvc_device *dev,
 		ftype = UVC_VS_FRAME_MJPEG;
 		break;
 
+	case UVC_VS_FORMAT_H264:
+		if (buflen < UVC_DT_FRAME_H264_SIZE(0)) {
+			uvc_trace(UVC_TRACE_DESCR, "device %d videostreaming "
+			       "interface %d FORMAT error\n",
+			       dev->udev->devnum,
+			       alts->desc.bInterfaceNumber);
+			return -EINVAL;
+		}
+
+		strlcpy(format->name, "H264", sizeof(format->name));
+		format->fcc = V4L2_PIX_FMT_H264;
+		format->flags = UVC_FMT_FLAG_COMPRESSED;
+		format->bpp = 0;
+		ftype = UVC_VS_FRAME_H264;
+		break;
+
 	case UVC_VS_FORMAT_DV:
 		if (buflen < 9) {
 			uvc_trace(UVC_TRACE_DESCR, "device %d videostreaming "
@@ -814,6 +830,7 @@ static int uvc_parse_streaming(struct uvc_device *dev,
 		switch (_buffer[2]) {
 		case UVC_VS_FORMAT_UNCOMPRESSED:
 		case UVC_VS_FORMAT_MJPEG:
+		case UVC_VS_FORMAT_H264:
 		case UVC_VS_FORMAT_FRAME_BASED:
 			nformats++;
 			break;
@@ -840,6 +857,13 @@ static int uvc_parse_streaming(struct uvc_device *dev,
 			nframes++;
 			if (_buflen > 25)
 				nintervals += _buffer[25] ? _buffer[25] : 3;
+			break;
+
+		case UVC_VS_FRAME_H264:
+			nframes++;
+			int index = offsetof(struct uvc_frame_h264, bNumFrameIntervals);
+			if (_buflen > index)
+				nintervals += _buffer[index] ? _buffer[index] : 1;
 			break;
 
 		case UVC_VS_FRAME_FRAME_BASED:
