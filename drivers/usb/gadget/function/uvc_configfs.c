@@ -1509,6 +1509,7 @@ UVC_ATTR(uvcg_uncompressed_, cname, aname);
 
 #define identity_conv(x) (x)
 
+UVCG_UNCOMPRESSED_ATTR_RO(b_format_index, bFormatIndex, identity_conv);
 UVCG_UNCOMPRESSED_ATTR(b_bits_per_pixel, bBitsPerPixel, identity_conv);
 UVCG_UNCOMPRESSED_ATTR(b_default_frame_index, bDefaultFrameIndex,
 		       identity_conv);
@@ -1539,6 +1540,7 @@ uvcg_uncompressed_bma_controls_store(struct config_item *item,
 UVC_ATTR(uvcg_uncompressed_, bma_controls, bmaControls);
 
 static struct configfs_attribute *uvcg_uncompressed_attrs[] = {
+	&uvcg_uncompressed_attr_b_format_index,
 	&uvcg_uncompressed_attr_guid_format,
 	&uvcg_uncompressed_attr_b_bits_per_pixel,
 	&uvcg_uncompressed_attr_b_default_frame_index,
@@ -1710,6 +1712,7 @@ UVC_ATTR(uvcg_mjpeg_, cname, aname)
 
 #define identity_conv(x) (x)
 
+UVCG_MJPEG_ATTR_RO(b_format_index, bFormatIndex, identity_conv);
 UVCG_MJPEG_ATTR(b_default_frame_index, bDefaultFrameIndex,
 		       identity_conv);
 UVCG_MJPEG_ATTR_RO(bm_flags, bmFlags, identity_conv);
@@ -1740,6 +1743,7 @@ uvcg_mjpeg_bma_controls_store(struct config_item *item,
 UVC_ATTR(uvcg_mjpeg_, bma_controls, bmaControls);
 
 static struct configfs_attribute *uvcg_mjpeg_attrs[] = {
+	&uvcg_mjpeg_attr_b_format_index,
 	&uvcg_mjpeg_attr_b_default_frame_index,
 	&uvcg_mjpeg_attr_bm_flags,
 	&uvcg_mjpeg_attr_b_aspect_ratio_x,
@@ -1906,6 +1910,7 @@ UVC_ATTR(uvcg_h264_, cname, aname)
 
 #define identity_conv(x) (x)
 
+UVCG_H264_ATTR_RO(b_format_index, bFormatIndex, identity_conv);
 UVCG_H264_ATTR(b_default_frame_index, bDefaultFrameIndex,
 		       identity_conv);
 
@@ -1934,6 +1939,7 @@ uvcg_h264_bma_controls_store(struct config_item *item,
 UVC_ATTR(uvcg_h264_, bma_controls, bmaControls);
 
 static struct configfs_attribute *uvcg_h264_attrs[] = {
+	&uvcg_h264_attr_b_format_index,
 	&uvcg_h264_attr_b_default_frame_index,
 	&uvcg_h264_attr_bma_controls,
 	NULL,
@@ -2288,28 +2294,28 @@ static int __uvcg_fill_strm(void *priv1, void *priv2, void *priv3, int n,
 				container_of(fmt, struct uvcg_uncompressed,
 					     fmt);
 
-			memcpy(*dest, &u->desc, sizeof(u->desc));
-			*dest += sizeof(u->desc);
 			unc->bNumFrameDescriptors = fmt->num_frames;
 			unc->bFormatIndex = n + 1;
+			memcpy(*dest, &u->desc, sizeof(u->desc));
+			*dest += sizeof(u->desc);
 		} else if (fmt->type == UVCG_MJPEG) {
 			struct uvc_format_mjpeg *mjp = *dest;
 			struct uvcg_mjpeg *m =
 				container_of(fmt, struct uvcg_mjpeg, fmt);
 
-			memcpy(*dest, &m->desc, sizeof(m->desc));
-			*dest += sizeof(m->desc);
 			mjp->bNumFrameDescriptors = fmt->num_frames;
 			mjp->bFormatIndex = n + 1;
+			memcpy(*dest, &m->desc, sizeof(m->desc));
+			*dest += sizeof(m->desc);
 		} else if (fmt->type == UVCG_H264) {
 			struct uvc_format_h264 *hf = *dest;
 			struct uvcg_h264 *h =
 				container_of(fmt, struct uvcg_h264, fmt);
 
-			memcpy(*dest, &h->desc, sizeof(h->desc));
-			*dest += sizeof(h->desc);
 			hf->bNumFrameDescriptors = fmt->num_frames;
 			hf->bFormatIndex = n + 1;
+			memcpy(*dest, &h->desc, sizeof(h->desc));
+			*dest += sizeof(h->desc);
 		} else {
 			return -EINVAL;
 		}
