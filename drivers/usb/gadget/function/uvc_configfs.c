@@ -1995,6 +1995,7 @@ static struct config_group *uvcg_h264_make(struct config_group *group,
 	h->desc.bDescriptorType		= USB_DT_CS_INTERFACE;
 	h->desc.bDescriptorSubType	= UVC_VS_FORMAT_H264;
 	h->desc.bDefaultFrameIndex	= 1;
+	h->desc.bNumFrameDescriptors	= 1;
 	h->desc.bMaxCodecConfigDelay	= 0x4;
 	h->desc.bmSupportedSliceModes			= 0;
 	h->desc.bmSupportedSyncFrameTypes		= 0x76;
