@@ -259,36 +259,6 @@ uvc_v4l2_ioctl_default(struct file *file, void *fh, bool valid_prio,
 	}
 }
 
-struct uvc_v4l2_format {
-	__u32 flags;
-	__u8 description[32];
-	__u32 fourcc;
-};
-
-static const struct uvc_v4l2_format uvc_v4l2_formats[] = {
-	{ 0, "YUV 4:2:2", v4l2_fourcc('Y', 'U', 'Y', 'V') },
-	{ V4L2_FMT_FLAG_COMPRESSED, "MJPEG", v4l2_fourcc('M', 'J', 'P', 'G') },
-	{ V4L2_FMT_FLAG_COMPRESSED, "H264", v4l2_fourcc('H', '2', '6', '4') },
-};
-
-
-static int
-uvc_v4l2_enum_fmt_out(struct file *file, void *fh, 
-			struct v4l2_fmtdesc *f)
-{
-	const struct uvc_v4l2_format *fmt;
-
-	if (!f || f->index < 0 || f->index >= ARRAY_SIZE(uvc_v4l2_formats)) {
-		return -EINVAL;
-	}
-
-	fmt = &uvc_v4l2_formats[f->index];
-	f->pixelformat = fmt->fourcc;
-	f->flags = fmt->flags;
-	memcpy(f->description, f->description, 32);
-	return 0;
-}
-
 const struct v4l2_ioctl_ops uvc_v4l2_ioctl_ops = {
 	.vidioc_querycap = uvc_v4l2_querycap,
 	.vidioc_g_fmt_vid_out = uvc_v4l2_get_format,
@@ -302,7 +272,6 @@ const struct v4l2_ioctl_ops uvc_v4l2_ioctl_ops = {
 	.vidioc_subscribe_event = uvc_v4l2_subscribe_event,
 	.vidioc_unsubscribe_event = uvc_v4l2_unsubscribe_event,
 	.vidioc_default = uvc_v4l2_ioctl_default,
-	.vidioc_enum_fmt_vid_out = uvc_v4l2_enum_fmt_out,
 };
 
 /* --------------------------------------------------------------------------
